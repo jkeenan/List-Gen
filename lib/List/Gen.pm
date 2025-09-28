@@ -4127,6 +4127,7 @@ C< primes > always returns the same generator.
                 }
                 $build->(1000);
                 &iterate(sub {
+            ### BBB: goto LABEL in this block
                     if (List::Gen::DEBUG_PRIME and $DEBUG_PRIME) {
                         return $n++ if $n == 2;
                         no warnings;
@@ -4154,6 +4155,7 @@ C< primes > always returns the same generator.
         $ops{prime} = sub ($) {
             my $n = @_ ? $_[0] : $_;
             return $n == 2 if not $n & 1 or $n < 2;
+            ### AAA: goto LABEL in this block
             if (List::Gen::DEBUG_PRIME and $DEBUG_PRIME) {
                 no warnings;
                 goto trial_division
