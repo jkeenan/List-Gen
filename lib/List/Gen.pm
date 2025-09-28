@@ -1,5 +1,6 @@
 package List::Gen;
     use warnings;
+    no warnings 'qw';
     use strict;
     use Carp;
     use Symbol       qw/delete_package/;
