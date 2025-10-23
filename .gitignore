@@ -1,0 +1,11 @@
+/blib/
+/.build/
+/_build/
+/Build
+/META.yml
+/META.json
+/MYMETA.*
+/META.yml
+/META.json
+/MYMETA.*
+/pm_to_blib
