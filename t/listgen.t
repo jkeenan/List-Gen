@@ -2831,14 +2831,14 @@ T {
         is primes->while('<50')->apply->size, 15
     }
 
-#    t 'uniq'; {
-#        my $source = list(qw(a b c a b c d));
-#        my $expect = 'a b c d';
-#
-#        is $source->uniq->str,                  $expect;
-#        is $source->sort->uniq->str,            $expect;
-#        is $source->shuffle->uniq->sort->str,   $expect;
-#    }
+    t 'uniq'; {
+        my $source = list(qw(a b c a b c d));
+        my $expect = 'a b c d';
+
+        is $source->uniq->str,                  $expect;
+        is $source->sort->uniq->str,            $expect;
+        is $source->shuffle->uniq->sort->str,   $expect;
+    }
 
     {
         my @src = (<1..>, <a..>, <A..>, -<1..>);
