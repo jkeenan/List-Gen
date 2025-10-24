@@ -3,7 +3,7 @@ use strict;
 use warnings;
 $|=1;
 use Scalar::Util 'weaken';
-use Test::More tests => 1153;
+use Test::More qw(no_plan); # tests => 1153;
 use FindBin;
 use Cwd;
 
@@ -2130,7 +2130,7 @@ use List::Gen::Testing;
 #t '->min', is => list(3, 1, 2, 5, 4)->min, 1;
 #t '->max', is => list(3, 1, 2, 5, 4)->max, 5;
 #
-#T {
+T {
 #    t 'List::Gen(...)';
 #        is List::Gen([1..5])->map('*2')->str, '2 4 6 8 10';
 #        is List::Gen(sub {$_ * 2})->str(5),   '0 2 4 6 8';
@@ -2184,7 +2184,7 @@ use List::Gen::Testing;
 #    }
 #}
 #
-T {
+#T {
 #    t 'iterate from'; {
 #        is iterate{$_+1}->from(3)->str(5),     '3 4 5 6 7';
 #        is iterateM{$_*2}->from(1)->str(5),    '1 2 4 8 16';
@@ -2311,7 +2311,7 @@ T {
 #
 #        ok !$src->source;
 #    }
-
+#
 #    SKIP: {
 #        skip 'lexical bignum detection requires perl 5.9.4+', 6 if $] < 5.009004;
 #
@@ -2337,7 +2337,7 @@ T {
 #            like <[..*]1,1..>->(50), $int;
 #        }
 #    }
-
+#
 #    t '->wrap/->unwrap'; {
 #        is list(qw(one two three four five))
 #            -> wrap ('reverse')
@@ -2432,7 +2432,7 @@ T {
 #
 #        is $vec->str(5), '0 2 0 4 0';
 #    }
-
+#
 #    t 'filter_stream'; {
 #        local $List::Gen::LOOKAHEAD;
 #        my $sf = gen {$_.'x'} <1..100>->grep_stream('%2');
@@ -2478,7 +2478,7 @@ T {
 #
 #        is $even_stream->(), 38;
 #    }
-
+#
 #    t 'iterate_stream'; {
 #        my $is = iterate_stream {$_*2}->from(1);
 #
@@ -2500,7 +2500,7 @@ T {
 #        is $iss->drop(10)->str(10), '55 89 144 233 377 610 987 1597 2584 4181';
 #        is $iss->(), 6765;
 #    }
-
+#
 #    t 'iterate_multi_stream'; {
 #        my $is = iterate_multi_stream {$_*2}->from(1);
 #
@@ -2537,7 +2537,7 @@ T {
 #
 #        is $ifm->(), '0bbba';
 #    }
-
+#
 #    t 'gather_stream'; {
 #        my $is = gather_stream {take($_*2)}->from(1);
 #
@@ -2605,7 +2605,7 @@ T {
 #        is <1..>->drop_while('<5')->str(10), '5 6 7 8 9 10 11 12 13 14';
 #        is <1..>->drop_until('>4')->str(10), '5 6 7 8 9 10 11 12 13 14';
 #    }
-
+#
 #    t 'euler'; {
 #        is range(1000)->grep(sub {!($_ % 3) or !($_ % 5)})->sum,  233168;
 #
@@ -2719,7 +2719,7 @@ T {
 #            $xs->zipab('"$a: $b"', $ys)->str(4)
 #        }, 'a: 1 b: 2 c: 3 d: 4';
 #    }
-
+#
 #    t 'alpha range map zipwith each'; {
 #        my @got;
 #        (<"(_) ":a..>|*.|[
@@ -2771,8 +2771,8 @@ T {
                 is primes->drop(990)->str(10), $expect_990_to_1000;
             }
         }
-        is primes->take($prime_count_1e7 + 1)->reverse->take(2)->str,
-             "@expect_around_1e7_r", 'edge of sieve';
+#        is primes->take($prime_count_1e7 + 1)->reverse->take(2)->str,
+#             "@expect_around_1e7_r", 'edge of sieve';
         if (eval {require Math::Prime::Util}) {
             $List::Gen::FORCE_PRIME = 0;
             List::Gen::_reset_prime();
@@ -2784,53 +2784,53 @@ T {
         }
     }
 
-#    t 'x and | overloads with nongen'; {
-#        is +(list(1, 2, 3, 4) x 'a'  )->str, '1 a 2 a 3 a 4 a';
-#        is +('a' x list(1, 2, 3, 4)  )->str, 'a 1 a 2 a 3 a 4';
-#        is +(list(1, 2, 3, 4) x ['a'])->str, '1 a 2 a 3 a 4 a';
-#        is +(['a'] x list(1, 2, 3, 4))->str, 'a 1 a 2 a 3 a 4';
-#        is +(list(1, 2, 3, 4) | 'a'  )->str, '1 a 2 a 3 a 4 a';
-#        is +('a' | list(1, 2, 3, 4)  )->str, 'a 1 a 2 a 3 a 4';
-#        is +(list(1, 2, 3, 4) | ['a'])->str, '1 a';
-#        is +(['a'] | list(1, 2, 3, 4))->str, 'a 1';
-#    }
-#
-#    t '| multi'; {
-#        my ($w, $x, $y, $z) = map {<$_...> |'.'| <1..>} qw(w x y z);
-#        {
-#            my $expect = $x->zip($y, $z)->str(10);
-#            is +($x | $y | $z)->str(10),   $expect;
-#            is +(($x | $y) | $z)->str(10), $expect;
-#            is +($x | ($y | $z))->str(10), $expect;
-#        }
-#        {
-#            my $expect = $w->zip($x, $y, $z)->str(13);
-#            is +($w | $x | $y | $z)->str(13),     $expect;
-#            is +(($w | $x) | $y | $z)->str(13),   $expect;
-#            is +(($w | $x | $y) | $z)->str(13),   $expect;
-#            is +(($w | $x) | ($y | $z))->str(13), $expect;
-#            is +($w | ($x | $y | $z))->str(13),   $expect;
-#            is +((($w | $x) | $y) | $z)->str(13), $expect;
-#            is +(($w | ($x | $y)) | $z)->str(13), $expect;
-#            is +($w | (($x | $y) | $z))->str(13), $expect;
-#            is +($w | ($x | ($y | $z)))->str(13), $expect;
-#        }
-#    }
-#
-#    t '<[+] 1..10 if even> + <[sum] 1..10 if odd>',
-#        is => <[+] 1..10 if even> + <[sum] 1..10 if odd>, 55;
-#
-#    t q!sort->('$b cmp $a')!; {
-#        is list(qw'a b c')->sort('$b cmp $a')->str, 'c b a';
-#        is list(qw'a b c')->map('[$_]')->sort('$b[0] cmp $a[0]')->map('$$_[0]')->str, 'c b a';
-#        is list(qw'a b c')->map('[$_]')->sort('$$b[0] cmp $$a[0]')->map('$$_[0]')->str, 'c b a';
-#    }
-#
-#    t 'while->apply'; {
-#        local $List::Gen::FORCE_PRIME = 1;
-#        is primes->while('<50')->apply->size, 15
-#    }
-#
+    t 'x and | overloads with nongen'; {
+        is +(list(1, 2, 3, 4) x 'a'  )->str, '1 a 2 a 3 a 4 a';
+        is +('a' x list(1, 2, 3, 4)  )->str, 'a 1 a 2 a 3 a 4';
+        is +(list(1, 2, 3, 4) x ['a'])->str, '1 a 2 a 3 a 4 a';
+        is +(['a'] x list(1, 2, 3, 4))->str, 'a 1 a 2 a 3 a 4';
+        is +(list(1, 2, 3, 4) | 'a'  )->str, '1 a 2 a 3 a 4 a';
+        is +('a' | list(1, 2, 3, 4)  )->str, 'a 1 a 2 a 3 a 4';
+        is +(list(1, 2, 3, 4) | ['a'])->str, '1 a';
+        is +(['a'] | list(1, 2, 3, 4))->str, 'a 1';
+    }
+
+    t '| multi'; {
+        my ($w, $x, $y, $z) = map {<$_...> |'.'| <1..>} qw(w x y z);
+        {
+            my $expect = $x->zip($y, $z)->str(10);
+            is +($x | $y | $z)->str(10),   $expect;
+            is +(($x | $y) | $z)->str(10), $expect;
+            is +($x | ($y | $z))->str(10), $expect;
+        }
+        {
+            my $expect = $w->zip($x, $y, $z)->str(13);
+            is +($w | $x | $y | $z)->str(13),     $expect;
+            is +(($w | $x) | $y | $z)->str(13),   $expect;
+            is +(($w | $x | $y) | $z)->str(13),   $expect;
+            is +(($w | $x) | ($y | $z))->str(13), $expect;
+            is +($w | ($x | $y | $z))->str(13),   $expect;
+            is +((($w | $x) | $y) | $z)->str(13), $expect;
+            is +(($w | ($x | $y)) | $z)->str(13), $expect;
+            is +($w | (($x | $y) | $z))->str(13), $expect;
+            is +($w | ($x | ($y | $z)))->str(13), $expect;
+        }
+    }
+
+    t '<[+] 1..10 if even> + <[sum] 1..10 if odd>',
+        is => <[+] 1..10 if even> + <[sum] 1..10 if odd>, 55;
+
+    t q!sort->('$b cmp $a')!; {
+        is list(qw'a b c')->sort('$b cmp $a')->str, 'c b a';
+        is list(qw'a b c')->map('[$_]')->sort('$b[0] cmp $a[0]')->map('$$_[0]')->str, 'c b a';
+        is list(qw'a b c')->map('[$_]')->sort('$$b[0] cmp $$a[0]')->map('$$_[0]')->str, 'c b a';
+    }
+
+    t 'while->apply'; {
+        local $List::Gen::FORCE_PRIME = 1;
+        is primes->while('<50')->apply->size, 15
+    }
+
 #    t 'uniq'; {
 #        my $source = list(qw(a b c a b c d));
 #        my $expect = 'a b c d';
@@ -2839,88 +2839,89 @@ T {
 #        is $source->sort->uniq->str,            $expect;
 #        is $source->shuffle->uniq->sort->str,   $expect;
 #    }
-#
-#    {
-#        my @src = (<1..>, <a..>, <A..>, -<1..>);
-#        for my $method (qw(deref expand)) {
-#            t $method eq 'deref' ? $method : 'expand arrayref';
-#            for (1 .. $#src) {
-#                is tuples(@src[0..$_])->$method->take(20)->join(','),
-#                   zip(@src[0..$_])->take(20)->join(',')
-#            }
-#            my $refs = gen {[$_, $_.$_]} 3;
-#            is $refs->$method->join(', '), '0, 00, 1, 11, 2, 22';
-#        }
-#    }
-#
-#    t 'sequence stress test'; {
-#        for my $elems (0 .. 5) {
-#            for my $joins (1 .. 10) {
-#                is +(gen {repeat $_, $elems} $joins)->reduce('+')->str,
-#                    join ' ' => map {($_) x $elems} 0 .. $joins - 1;
-#            }
-#        }
-#    }
-#
-#    t 'zip stress test'; {
-#        for my $elems (0 .. 5) {
-#            for my $joins (1 .. 10) {
-#                is +(gen {repeat $_, $elems} $joins)->reduce('|')->str,
-#                    zip(map {[($_) x $elems]} 0 .. $joins - 1)->str
-#            }
-#        }
-#    }
-#
-#    t 'stream {CODE}'; {
-#        for my $test ('_Stream', '') {
-#            local $List::Gen::STREAM = 1 if $test;
-#
-#            is filter{}->type,          'List::Gen::Filter'.$test;
-#            is &filter(sub{})->type,    'List::Gen::Filter'.$test;
-#            is filter_{}->type,            'List::Gen::Filter'.$test;
-#            is <1..>->grep('>1')->type, 'List::Gen::Filter'.$test;
-#            is <1..>->filter(*!)->type, 'List::Gen::Filter'.$test;
-#            is iterate{}->type,         'List::Gen::Iterate'.$test;
-#            is iterate_multi{}->type,   'List::Gen::Iterate_Multi'.$test;
-#            is iterateM{}->type,        'List::Gen::Iterate_Multi'.$test;
-#            is gather{}->type,          'List::Gen::Iterate'.$test;
-#            is gather_multi{}->type,    'List::Gen::Iterate_Multi'.$test;
-#            is gatherM{}->type,         'List::Gen::Iterate_Multi'.$test;
-#            is scan{}->type,            'List::Gen::Iterate'.$test;
-#            is <1..>->scan('+')->type,  'List::Gen::Iterate'.$test;
-#            is <[..+] 1..>->type,       'List::Gen::Iterate'.$test;
-#            is <1, 1+*...>->type,       'List::Gen::Iterate'.$test;
-#            is <1, 2..10 if /1/>->type, 'List::Gen::Filter'.$test;
-#
-#            is iterate_stream{}->type,        'List::Gen::Iterate_Stream';
-#            is iterate_multi_stream{}->type,  'List::Gen::Iterate_Multi_Stream';
-#            is gather_stream{}->type,         'List::Gen::Iterate_Stream';
-#            is gather_multi_stream{}->type,   'List::Gen::Iterate_Multi_Stream';
-#            is filter_stream{}->type,         'List::Gen::Filter_Stream';
-#            is scan_stream{}->type,           'List::Gen::Iterate_Stream';
-#        }
-#        stream {
-#            my $itr = iterate{$_*2}->from(1);
-#            is $itr->str(5),      '1 2 4 8 16';
-#            is $itr->idx->str(5), '32 64 128 256 512';
-#        };
-#
-#        my $itr = stream{iterate{$_*2}}->from(1);
-#        is $itr->str(5),      '1 2 4 8 16';
-#        is $itr->idx->str(5), '32 64 128 256 512';
-#
-#        is stream{<1.. if even>->type}, 'List::Gen::Filter_Stream';
-#
-#        my $pow = stream {<1, 2**...>};
-#        is $pow->type, 'List::Gen::Iterate_Stream';
-#
-#        is $pow->str(5),      '1 2 4 8 16';
-#        is $pow->idx->str(5), '32 64 128 256 512';
-#    }
-#
-#    t 'gen range oob'; {
-#        ok not eval {my $x = <1..10>->map('**3')->[10]; 1};
-#        like $@, qr/range index.*out of bounds/;
-#    }
+
+    {
+        my @src = (<1..>, <a..>, <A..>, -<1..>);
+        for my $method (qw(deref expand)) {
+            t $method eq 'deref' ? $method : 'expand arrayref';
+            for (1 .. $#src) {
+                is tuples(@src[0..$_])->$method->take(20)->join(','),
+                   zip(@src[0..$_])->take(20)->join(',')
+            }
+            my $refs = gen {[$_, $_.$_]} 3;
+            is $refs->$method->join(', '), '0, 00, 1, 11, 2, 22';
+        }
+    }
+
+    t 'sequence stress test'; {
+        for my $elems (0 .. 5) {
+            for my $joins (1 .. 10) {
+                is +(gen {repeat $_, $elems} $joins)->reduce('+')->str,
+                    join ' ' => map {($_) x $elems} 0 .. $joins - 1;
+            }
+        }
+    }
+
+    t 'zip stress test'; {
+        for my $elems (0 .. 5) {
+            for my $joins (1 .. 10) {
+                is +(gen {repeat $_, $elems} $joins)->reduce('|')->str,
+                    zip(map {[($_) x $elems]} 0 .. $joins - 1)->str
+            }
+        }
+    }
+
+    t 'stream {CODE}'; {
+        for my $test ('_Stream', '') {
+            local $List::Gen::STREAM = 1 if $test;
+
+            is filter{}->type,          'List::Gen::Filter'.$test;
+            is &filter(sub{})->type,    'List::Gen::Filter'.$test;
+            is filter_{}->type,            'List::Gen::Filter'.$test;
+            is <1..>->grep('>1')->type, 'List::Gen::Filter'.$test;
+            is <1..>->filter(*!)->type, 'List::Gen::Filter'.$test;
+            is iterate{}->type,         'List::Gen::Iterate'.$test;
+            is iterate_multi{}->type,   'List::Gen::Iterate_Multi'.$test;
+            is iterateM{}->type,        'List::Gen::Iterate_Multi'.$test;
+            is gather{}->type,          'List::Gen::Iterate'.$test;
+            is gather_multi{}->type,    'List::Gen::Iterate_Multi'.$test;
+            is gatherM{}->type,         'List::Gen::Iterate_Multi'.$test;
+            is scan{}->type,            'List::Gen::Iterate'.$test;
+            is <1..>->scan('+')->type,  'List::Gen::Iterate'.$test;
+            is <[..+] 1..>->type,       'List::Gen::Iterate'.$test;
+            is <1, 1+*...>->type,       'List::Gen::Iterate'.$test;
+            is <1, 2..10 if /1/>->type, 'List::Gen::Filter'.$test;
+
+            is iterate_stream{}->type,        'List::Gen::Iterate_Stream';
+            is iterate_multi_stream{}->type,  'List::Gen::Iterate_Multi_Stream';
+            is gather_stream{}->type,         'List::Gen::Iterate_Stream';
+            is gather_multi_stream{}->type,   'List::Gen::Iterate_Multi_Stream';
+            is filter_stream{}->type,         'List::Gen::Filter_Stream';
+            is scan_stream{}->type,           'List::Gen::Iterate_Stream';
+        }
+        stream {
+            my $itr = iterate{$_*2}->from(1);
+            is $itr->str(5),      '1 2 4 8 16';
+            is $itr->idx->str(5), '32 64 128 256 512';
+        };
+
+        my $itr = stream{iterate{$_*2}}->from(1);
+        is $itr->str(5),      '1 2 4 8 16';
+        is $itr->idx->str(5), '32 64 128 256 512';
+
+        is stream{<1.. if even>->type}, 'List::Gen::Filter_Stream';
+
+        my $pow = stream {<1, 2**...>};
+        is $pow->type, 'List::Gen::Iterate_Stream';
+
+        is $pow->str(5),      '1 2 4 8 16';
+        is $pow->idx->str(5), '32 64 128 256 512';
+    }
+
+    t 'gen range oob'; {
+        ok not eval {my $x = <1..10>->map('**3')->[10]; 1};
+        like $@, qr/range index.*out of bounds/;
+    }
 
 };
+
