@@ -4131,7 +4131,7 @@ C< primes > always returns the same generator.
                     if (List::Gen::DEBUG_PRIME and $DEBUG_PRIME) {
                         return $n++ if $n == 2;
                         no warnings;
-                        goto trial_division
+                        next trial_division;
                     }
                     if ($n <= 9999991) {
                         $n > $max and $build->($n * 10)
@@ -4158,7 +4158,7 @@ C< primes > always returns the same generator.
             ### AAA: goto LABEL in this block
             if (List::Gen::DEBUG_PRIME and $DEBUG_PRIME) {
                 no warnings;
-                goto trial_division
+                next trial_division;
             }
             if ($have_mpu && !$FORCE_PRIME) {
                 return Math::Prime::Util::is_prime($n);
